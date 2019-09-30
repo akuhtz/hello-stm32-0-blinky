@@ -3,10 +3,15 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/systick.h>
+//#include <libopencm3/stm32/dma.h>
 
-extern "C" {
+//extern "C" {
     void sys_tick_handler(void);
-}
+//}
+
+//#define BIDIB_DMA DMA1
+//#define BIDIB_DMA_CHANNEL DMA_CHANNEL7
+
 
 static void clock_setup() {
     // First, let's ensure that our clock is running off the high-speed internal
@@ -17,6 +22,7 @@ static void clock_setup() {
     // the peripheral clock to this GPIO bank in order to use it.
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
+    rcc_periph_clock_enable(RCC_GPIOC);
 
     // In order to use our UART, we must enable the clock to it as well.
     rcc_periph_clock_enable(RCC_USART1);
@@ -61,8 +67,8 @@ void delay(uint64_t duration) {
 }
 
 static void gpio_setup() {
-    // Our test LED is connected to Port A pin 11, so let's set it as output
-    gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO11);
+    // Our test LED is connected to Port C pin 13, so let's set it as output
+    gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 }
 
 int main() {
@@ -70,12 +76,22 @@ int main() {
     systick_setup();
     gpio_setup();
 
+//    dma_channel_reset(BIDIB_DMA, BIDIB_DMA_CHANNEL);
+
     // Toggle the LED on and off forever
     while (1) {
-        gpio_set(GPIOA, GPIO11);
+        gpio_set(GPIOC, GPIO13);
         delay(1000);
-        gpio_clear(GPIOA, GPIO11);
-        delay(1000);
+        gpio_clear(GPIOC, GPIO13);
+        delay(500);
+        gpio_set(GPIOC, GPIO13);
+        delay(500);
+        gpio_clear(GPIOC, GPIO13);
+        delay(2500);
+        gpio_set(GPIOC, GPIO13);
+        delay(500);
+        gpio_clear(GPIOC, GPIO13);
+        delay(500);
     }
 
     return 0;

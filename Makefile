@@ -1,5 +1,11 @@
 # We only need to build our one source file
-OBJS = main.o
+#OBJS = ./src/main.o
+
+
+src = $(wildcard src/*.c) \
+      $(wildcard src/kernel/*.c)
+OBJS = $(src:.c=.o)
+
 
 # We've got opencm3 in the folder with us
 OPENCM3_DIR := ./libopencm3
@@ -11,12 +17,13 @@ BINARY = main
 LDSCRIPT = stm32f0.ld
 
 # Using the stm32f0 series chip
-LIBNAME		= opencm3_stm32f0
-DEFS		+= -DSTM32F0
+LIBNAME		= opencm3_stm32f1
+DEFS		+= -DSTM32F1
 
 # Target-specific flags
 FP_FLAGS	?= -msoft-float
-ARCH_FLAGS	= -mthumb -mcpu=cortex-m0 $(FP_FLAGS)
+#ARCH_FLAGS	= -mthumb -mcpu=cortex-m0 $(FP_FLAGS)
+ARCH_FLAGS	= -mthumb -mcpu=cortex-m3 $(FP_FLAGS) -mfix-cortex-m3-ldrd
 
 # Where our Black Magic Probe is attached
 BMP_PORT = /dev/ttyACM0
@@ -89,6 +96,10 @@ flash: $(BINARY).flash
 
 GENERATED_BINARIES=$(BINARY).elf $(BINARY).bin $(BINARY).hex $(BINARY).srec $(BINARY).list $(BINARY).map
 
+#myprog: $(OBJS)
+#    $(CC) -o $@ $^ $(LDFLAGS)
+
+
 %.bin: %.elf
 	$(OBJCOPY) -Obinary $(*).elf $(*).bin
 
@@ -107,11 +118,11 @@ GENERATED_BINARIES=$(BINARY).elf $(BINARY).bin $(BINARY).hex $(BINARY).srec $(BI
 %.o: %.c
 	$(CC) $(TGT_CFLAGS) $(CFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).c
 
-%.o: %.cxx
-	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cxx
-
-%.o: %.cpp
-	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cpp
+#%.o: %.cxx
+#	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cxx
+#
+#%.o: %.cpp
+#	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cpp
 
 %.size: %.elf
 	@echo "Output code size:"

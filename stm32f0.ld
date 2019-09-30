@@ -4,11 +4,20 @@ SRAM starts at 0x20000000
 
 SRAM/ROM sizes vary - STM32F070CBT6 is 128k flash, 16K sram
 */
-
+/*
 MEMORY
 {
 	rom (rx) : ORIGIN = 0x08000000, LENGTH = 128K
 	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 16K
+}
+*/
+
+
+
+MEMORY
+{
+  rom (rx) : ORIGIN = 0x08000000, LENGTH = 0x08000   /* 32k */
+  ram (rwx)  : ORIGIN = 0x20000000, LENGTH = 0x01000   /*  4k */
 }
 
 /* Include the common ld script. */
